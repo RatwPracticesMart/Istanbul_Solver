@@ -561,9 +561,10 @@
             return result;
         }
 
+        // FIND PAIR - ALLOWS USING SAME ROW TWICE (Price 2 + Price 2)
         function findPair(targetCents, prices) {
             for (let i = 0; i < prices.length; i++) {
-                for (let j = i + 1; j < prices.length; j++) {
+                for (let j = i; j < prices.length; j++) {
                     if (prices[i].cents + prices[j].cents === targetCents) {
                         return [prices[i].value, prices[j].value];
                     }
@@ -585,7 +586,7 @@
                 card.classList.remove('correct', 'wrong');
                 status.textContent = '';
 
-                if (targetVal === null || prices.length < 2) {
+                if (targetVal === null || prices.length < 1) {
                     ans1.value = '';
                     ans2.value = '';
                     return;
