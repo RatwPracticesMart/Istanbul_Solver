@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Price Pairing Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7d9bf;
+            color: #222;
+            padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: auto;
+            background: #e9c5a5;
+            border-radius: 14px;
+            padding: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 26px;
+            letter-spacing: 1px;
+            color: #1a3a6b;
+        }
+
+        .top {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .prices,
+        .targets {
+            border: 2px solid #dbad84;
+            border-radius: 12px;
+            padding: 12px;
+            background: #edbc91;
+        }
+
+        .prices h2,
+        .targets h2 {
+            text-align: center;
+            margin-bottom: 12px;
+            color: #1a3a6b;
+            font-size: 18px;
+        }
+
+        .priceRow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .priceInput {
+            flex: 1;
+            height: 36px;
+            border: 2px solid #dbad84;
+            border-radius: 6px;
+            padding: 0 8px;
+            font-size: 16px;
+            background: #ffffff;
+            min-width: 0;
+        }
+
+        .priceInput:focus {
+            outline: none;
+            border-color: #2b8cff;
+            box-shadow: 0 0 0 2px rgba(43, 140, 255, 0.2);
+        }
+
+        .targetCard {
+            border: 2px solid #dbad84;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            transition: .2s;
+            background: #edbc91;
+        }
+
+        .targetInput {
+            width: 100%;
+            height: 36px;
+            border: 2px solid #dbad84;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 10px;
+            background: #ffffff;
+        }
+
+        .targetInput:focus {
+            outline: none;
+            border-color: #2b8cff;
+            box-shadow: 0 0 0 2px rgba(43, 140, 255, 0.2);
+        }
+
+        .answerRow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .answerBox {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 16px;
+            background: #f5e6d6;
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 2px solid #dbad84;
+            min-height: 32px;
+        }
+
+        .answerInput {
+            border: none;
+            background: transparent;
+            padding: 0;
+            width: 70px;
+            height: 30px;
+            font-size: 16px;
+            text-align: center;
+            color: #1a3a6b;
+            font-weight: 700;
+            outline: none;
+            cursor: default;
+            pointer-events: none;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .answerInput:focus {
+            outline: none;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .plus {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a3a6b;
+        }
+
+        .status {
+            width: 28px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .correct {
+            background: #dff7df;
+            border-color: #2aa54f;
+        }
+
+        .wrong {
+            background: #ffe4e4;
+            border-color: #d63d3d;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: .2s;
+            color: #fff;
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        #undoBtn {
+            background: #f0a000;
+        }
+
+        #undoBtn:hover {
+            background: #cb8600;
+        }
+
+        #clearBtn {
+            background: #df4040;
+        }
+
+        #clearBtn:hover {
+            background: #b72f2f;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        @media(max-width:768px) {
+            body {
+                padding: 6px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+
+            .top {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .prices,
+            .targets {
+                padding: 8px;
+                border-width: 2px;
+            }
+
+            .prices h2,
+            .targets h2 {
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+
+            .priceRow {
+                font-size: 14px;
+                gap: 5px;
+                margin-bottom: 6px;
+            }
+
+            .priceInput {
+                height: 30px;
+                font-size: 14px;
+                padding: 0 6px;
+                border-width: 2px;
+            }
+
+            .targetCard {
+                padding: 8px;
+                margin-bottom: 8px;
+                border-width: 2px;
+            }
+
+            .targetInput {
+                height: 30px;
+                font-size: 14px;
+                margin-bottom: 8px;
+                border-width: 2px;
+            }
+
+            .answerRow {
+                gap: 5px;
+            }
+
+            .answerBox {
+                font-size: 13px;
+                padding: 2px 8px;
+                min-height: 28px;
+                border-width: 2px;
+                background: #f5e6d6;
+            }
+
+            .answerInput {
+                width: 50px;
+                height: 26px;
+                font-size: 13px;
+                font-weight: 700;
+            }
+
+            .plus {
+                font-size: 16px;
+            }
+
+            .status {
+                width: 22px;
+                font-size: 18px;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+
+            .buttons {
+                gap: 8px;
+                margin-top: 15px;
+            }
+        }
+
+        @media(max-width:400px) {
+            .top {
+                gap: 5px;
+            }
+
+            .prices,
+            .targets {
+                padding: 5px;
+            }
+
+            .priceInput {
+                height: 26px;
+                font-size: 12px;
+            }
+
+            .targetInput {
+                height: 26px;
+                font-size: 12px;
+            }
+
+            .answerBox {
+                padding: 2px 6px;
+                min-height: 24px;
+                font-size: 11px;
+            }
+
+            .answerInput {
+                width: 40px;
+                height: 22px;
+                font-size: 11px;
+            }
+
+            .plus {
+                font-size: 14px;
+            }
+
+            .status {
+                width: 18px;
+                font-size: 14px;
+            }
+
+            .priceRow {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+        }
+
+        @media(max-height:500px) and (orientation:landscape) {
+            .top {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .priceInput {
+                height: 28px;
+                font-size: 13px;
+            }
+
+            .targetInput {
+                height: 28px;
+                font-size: 13px;
+            }
+
+            .priceRow {
+                margin-bottom: 4px;
+            }
+
+            .targetCard {
+                margin-bottom: 6px;
+                padding: 6px;
+            }
+
+            .answerBox {
+                padding: 2px 6px;
+                min-height: 24px;
+            }
+
+            .answerInput {
+                width: 45px;
+                height: 22px;
+                font-size: 12px;
+            }
+
+            body {
+                padding: 4px;
+            }
+
+            .container {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>PRICE PAIRING</h1>
+
+    <div class="top">
+
+        <!-- LEFT SIDE -->
+        <div class="prices">
+            <h2>Prices</h2>
+            <div id="priceList">
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="0" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="1" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="2" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="3" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="4" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="5" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="6" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="7" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="8" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="9" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="10" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="11" inputmode="decimal"></div>
+                <div class="priceRow">$ <input type="number" step="0.01" class="priceInput" data-idx="12" inputmode="decimal"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="targets">
+            <h2>Targets</h2>
+
+            <div class="targetCard" data-target="0">
+                <input type="number" step="0.01" class="targetInput" placeholder="Target" data-target="0" inputmode="decimal">
+                <div class="answerRow">
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="0-0">
+                    </div>
+                    <span class="plus">+</span>
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="0-1">
+                    </div>
+                    <span class="status"></span>
+                </div>
+            </div>
+
+            <div class="targetCard" data-target="1">
+                <input type="number" step="0.01" class="targetInput" placeholder="Target" data-target="1" inputmode="decimal">
+                <div class="answerRow">
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="1-0">
+                    </div>
+                    <span class="plus">+</span>
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="1-1">
+                    </div>
+                    <span class="status"></span>
+                </div>
+            </div>
+
+            <div class="targetCard" data-target="2">
+                <input type="number" step="0.01" class="targetInput" placeholder="Target" data-target="2" inputmode="decimal">
+                <div class="answerRow">
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="2-0">
+                    </div>
+                    <span class="plus">+</span>
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="2-1">
+                    </div>
+                    <span class="status"></span>
+                </div>
+            </div>
+
+            <div class="targetCard" data-target="3">
+                <input type="number" step="0.01" class="targetInput" placeholder="Target" data-target="3" inputmode="decimal">
+                <div class="answerRow">
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="3-0">
+                    </div>
+                    <span class="plus">+</span>
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="3-1">
+                    </div>
+                    <span class="status"></span>
+                </div>
+            </div>
+
+            <div class="targetCard" data-target="4">
+                <input type="number" step="0.01" class="targetInput" placeholder="Target" data-target="4" inputmode="decimal">
+                <div class="answerRow">
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="4-0">
+                    </div>
+                    <span class="plus">+</span>
+                    <div class="answerBox">
+                        $ <input type="number" step="0.01" class="answerInput" readonly data-answer="4-1">
+                    </div>
+                    <span class="status"></span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="undoBtn">Undo</button>
+        <button id="clearBtn">Clear All</button>
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        const priceInputs = document.querySelectorAll('.priceInput');
+        const targetInputs = document.querySelectorAll('.targetInput');
+        const answerInputs = document.querySelectorAll('.answerInput');
+        const targetCards = document.querySelectorAll('.targetCard');
+        const statusSpans = document.querySelectorAll('.status');
+
+        const undoBtn = document.getElementById('undoBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        let history = [];
+
+        function getValue(input) {
+            const val = parseFloat(input.value);
+            return isNaN(val) ? null : val;
+        }
+
+        function cents(value) {
+            return Math.round(value * 100);
+        }
+
+        function getPricesArray() {
+            const result = [];
+            priceInputs.forEach((inp, idx) => {
+                const v = getValue(inp);
+                if (v !== null) {
+                    result.push({ index: idx, value: v, cents: cents(v) });
+                }
+            });
+            return result;
+        }
+
+        function findPair(targetCents, prices) {
+            for (let i = 0; i < prices.length; i++) {
+                for (let j = i + 1; j < prices.length; j++) {
+                    if (prices[i].cents + prices[j].cents === targetCents) {
+                        return [prices[i].value, prices[j].value];
+                    }
+                }
+            }
+            return null;
+        }
+
+        function solveAll() {
+            const prices = getPricesArray();
+
+            targetInputs.forEach((targetInp, idx) => {
+                const targetVal = getValue(targetInp);
+                const card = targetCards[idx];
+                const status = statusSpans[idx];
+                const ans1 = answerInputs[idx * 2];
+                const ans2 = answerInputs[idx * 2 + 1];
+
+                card.classList.remove('correct', 'wrong');
+                status.textContent = '';
+
+                if (targetVal === null || prices.length < 2) {
+                    ans1.value = '';
+                    ans2.value = '';
+                    return;
+                }
+
+                const targetCents = cents(targetVal);
+                const pair = findPair(targetCents, prices);
+
+                if (pair) {
+                    ans1.value = pair[0].toFixed(2);
+                    ans2.value = pair[1].toFixed(2);
+                    card.classList.add('correct');
+                    status.textContent = '✓';
+                } else {
+                    ans1.value = '';
+                    ans2.value = '';
+                    card.classList.add('wrong');
+                    status.textContent = '?';
+                }
+            });
+        }
+
+        function undoLast() {
+            if (history.length === 0) return;
+            const last = history.pop();
+            last.element.value = '';
+            history = history.filter(entry => entry.element !== last.element);
+            solveAll();
+            last.element.focus();
+        }
+
+        function clearAll() {
+            priceInputs.forEach(inp => inp.value = '');
+            targetInputs.forEach(inp => inp.value = '');
+            answerInputs.forEach(inp => inp.value = '');
+            targetCards.forEach(card => card.classList.remove('correct', 'wrong'));
+            statusSpans.forEach(sp => sp.textContent = '');
+            history = [];
+            solveAll();
+            if (priceInputs.length) priceInputs[0].focus();
+        }
+
+        function setupEnterNavigation() {
+            priceInputs.forEach((inp, idx) => {
+                inp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (idx < priceInputs.length - 1) {
+                            priceInputs[idx + 1].focus();
+                        } else {
+                            if (targetInputs.length) targetInputs[0].focus();
+                        }
+                    }
+                });
+            });
+
+            targetInputs.forEach((inp, idx) => {
+                inp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (idx < targetInputs.length - 1) {
+                            targetInputs[idx + 1].focus();
+                        } else {
+                            if (priceInputs.length) priceInputs[0].focus();
+                        }
+                    }
+                });
+            });
+        }
+
+        function setupHistory() {
+            const allInputs = document.querySelectorAll('input:not(.answerInput)');
+            allInputs.forEach(inp => {
+                inp.addEventListener('input', function() {
+                    history = history.filter(entry => entry.element !== this);
+                    history.push({ element: this, value: this.value });
+                    solveAll();
+                });
+            });
+        }
+
+        function setupAutoSelect() {
+            document.querySelectorAll('input:not(.answerInput)').forEach(inp => {
+                inp.addEventListener('focus', function() {
+                    this.select();
+                });
+            });
+        }
+
+        function init() {
+            undoBtn.addEventListener('click', undoLast);
+            clearBtn.addEventListener('click', clearAll);
+            setupHistory();
+            setupEnterNavigation();
+            setupAutoSelect();
+            solveAll();
+            if (priceInputs.length) priceInputs[0].focus();
+            console.log('Price Pairing Trainer Ready!');
+        }
+
+        init();
+    })();
+</script>
+
+</body>
+</html>

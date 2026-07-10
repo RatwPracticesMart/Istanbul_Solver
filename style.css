@@ -1,0 +1,45 @@
+.answerRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.answerBox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 18px;
+    background: #f8f9fa;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.answerInput {
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: 85px;
+    height: 38px;
+    font-size: 18px;
+    text-align: center;
+    color: #1a3a6b;
+    font-weight: 600;
+    outline: none;
+    cursor: default;
+    pointer-events: none;
+}
+
+.answerInput:focus {
+    outline: none;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.plus {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
